@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -13,6 +14,7 @@ import {
 @Unique('uq_uid', ['uid'])
 @Unique('uq_name', ['name'])
 export class Anime {
+  @Exclude()
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
@@ -26,9 +28,13 @@ export class Anime {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
+  @Exclude()
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @Exclude()
+  @ApiProperty()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

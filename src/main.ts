@@ -1,6 +1,6 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -14,9 +14,15 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true /*Ignora los atributos que no esten definidos en el DTO*/,
       forbidNonWhitelisted:
-        true /*Alertar de un error al cliente cuando se envie un atributo no definido en el DTO*/
+        true /*Alertar de un error al cliente cuando se envie un atributo no definido en el DTO*/,
+      transformOptions: {
+        enableImplicitConversion: true
+      }
     })
   );
+
+  // Serializar - sirve para transformar la información antes de retórnala
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
     .setTitle('Anime Api')
