@@ -10,7 +10,9 @@ export class AnimeController {
   constructor(private animeService: AnimeService) {}
 
   @Get(':uid')
-  findOne(@Param() findOneAnimeInput: FindOneAnimeInput): Anime {
+  findOne(
+    @Param() findOneAnimeInput: FindOneAnimeInput
+  ): Promise<Anime | null> {
     return this.animeService.findOne(findOneAnimeInput);
   }
 }
