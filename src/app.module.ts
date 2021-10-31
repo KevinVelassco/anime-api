@@ -35,7 +35,7 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
           password: configService.database.password,
           database: configService.database.database,
           autoLoadEntities: true,
-          synchronize: configService.environment !== 'production',
+          synchronize: false,
           logging: configService.database.log === 'yes'
         };
       }
