@@ -7,6 +7,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AnimeModule } from './modules/anime/anime.module';
 import { CharacterModule } from './modules/character/character.module';
+import { CommonModule } from './common/common.module';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
 
@@ -42,7 +45,10 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     }),
 
     AnimeModule,
-    CharacterModule
+    CharacterModule,
+    CommonModule,
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService]
