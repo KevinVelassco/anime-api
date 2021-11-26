@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 export default Joi.object({
   /* PORT APP */
   PORT: Joi.number().required(),
+  ACCESS_TOKEN_SECRET: Joi.required(),
 
   /* DATABASE INFORMATION */
   DATABASE_CLIENT: Joi.required(),
