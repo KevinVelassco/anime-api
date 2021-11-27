@@ -5,12 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
+import appConfig from './config/app.config';
+import appConfigSchema from './config/app.config.schema';
+
 import { CharacterModule } from './modules/character/character.module';
 import { CommonModule } from './common/common.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import appConfig from './config/app.config';
-import appConfigSchema from './config/app.config.schema';
+import { ImageModule } from './modules/image/image.module';
+import { AssignedImageModule } from './modules/assigned-image/assigned-image.module';
+import { RaceModule } from './modules/race/race.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -43,10 +48,13 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
       }
     }),
 
-    CharacterModule,
     CommonModule,
+    AuthModule,
     UserModule,
-    AuthModule
+    CharacterModule,
+    ImageModule,
+    AssignedImageModule,
+    RaceModule
   ],
   controllers: [AppController],
   providers: [AppService]
