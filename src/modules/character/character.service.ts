@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
-import { FindAllOutPut } from '../../common/dto/find-all-output.dto';
 import { Character } from './character.entity';
+import { FindAllOutPut } from '../../common/dto/find-all-output.dto';
 import { FindAllCharactersInput } from './dto/find-all-characters-input.dto';
+import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
 
 @Injectable()
 export class CharacterService {
@@ -32,5 +33,19 @@ export class CharacterService {
     });
 
     return { count, results };
+  }
+
+  public async findOne(
+    findOneCharacterInput: FindOneCharacterInput
+  ): Promise<Character | null> {
+    const { uid, checkIfExists = false } = findOneCharacterInput;
+
+    const item = await this.characterRepository.findOne({ where: { uid } });
+
+    if (checkIfExists && !item) {
+      throw new NotFoundException(`can't get the character with uuid ${uid}.`);
+    }
+
+    return item || null;
   }
 }
