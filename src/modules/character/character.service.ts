@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
 import { Character } from './character.entity';
-import { FindAllOutPut } from '../../common/dto/find-all-output.dto';
 import { FindAllCharactersInput } from './dto/find-all-characters-input.dto';
 import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
 
@@ -16,14 +15,14 @@ export class CharacterService {
 
   public async findAll(
     findAllCharactersInput: FindAllCharactersInput
-  ): Promise<FindAllOutPut> {
+  ): Promise<any> {
     const { limit = 10, skip = 0, ...filters } = findAllCharactersInput;
 
     let where: any = { ...filters };
 
     if (where.name) where = { ...filters, name: ILike(`%${filters.name}%`) };
 
-    const [results, count] = await this.characterRepository.findAndCount({
+    const items = await this.characterRepository.findAndCount({
       where,
       take: limit,
       skip,
@@ -32,7 +31,7 @@ export class CharacterService {
       }
     });
 
-    return { count, results };
+    return items;
   }
 
   public async findOne(
