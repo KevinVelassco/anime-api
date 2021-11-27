@@ -5,10 +5,16 @@ import {
   CreateDateColumn,
   Entity,
   Generated,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn
 } from 'typeorm';
+
+import { AssignedImage } from '../assigned-image/assigned-image.entity';
+import { Race } from '../race/race.entity';
 
 export enum CharacterStatus {
   ALIVE = 'Alive',
@@ -49,10 +55,6 @@ export class Character {
   status: CharacterStatus;
 
   @ApiProperty()
-  @Column({ type: 'varchar', length: 50 })
-  species: string;
-
-  @ApiProperty()
   @Column({
     type: 'enum',
     enum: CharacterGender
@@ -76,4 +78,14 @@ export class Character {
   @ApiProperty()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => Race, (race: Race) => race.characters)
+  @JoinColumn({ name: 'race_id' })
+  race: Race;
+
+  @OneToMany(
+    () => AssignedImage,
+    (assignedImage: AssignedImage) => assignedImage.character
+  )
+  assignedImages: AssignedImage[];
 }
