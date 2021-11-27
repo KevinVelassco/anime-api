@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AnimeModule } from './modules/anime/anime.module';
 import { CharacterModule } from './modules/character/character.module';
 import { CommonModule } from './common/common.module';
 import { UserModule } from './modules/user/user.module';
@@ -44,7 +43,6 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
       }
     }),
 
-    AnimeModule,
     CharacterModule,
     CommonModule,
     UserModule,
