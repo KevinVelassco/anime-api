@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { RaceService } from './race.service';
@@ -37,5 +46,10 @@ export class RaceController {
     @Body() updateRaceInput: UpdateRaceInput
   ): Promise<Race> {
     return this.raceService.update(findOneRaceInput, updateRaceInput);
+  }
+
+  @Delete(':uid')
+  delete(@Param() findOneRaceInput: FindOneRaceInput): Promise<Race> {
+    return this.raceService.delete(findOneRaceInput);
   }
 }
