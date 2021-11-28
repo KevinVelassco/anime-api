@@ -99,4 +99,17 @@ export class RaceService {
     const saved = await this.raceRepository.save(preloaded);
     return saved;
   }
+
+  public async delete(findOneRaceInput: FindOneRaceInput): Promise<Race> {
+    const { uid } = findOneRaceInput;
+
+    const existing = await this.findOne({
+      uid,
+      checkIfExists: true
+    });
+
+    const deleted = await this.raceRepository.remove(existing);
+
+    return deleted;
+  }
 }
