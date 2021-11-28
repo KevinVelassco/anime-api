@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ImageService } from './image.service';
@@ -7,6 +7,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { FindAllImagesInput } from './dto/find-all-images-input.dto';
 import { FindOneImageInput } from './dto/find-one-image-input.dto';
 import { CreateImageInput } from './dto/create-image-input.dto';
+import { UpdateImageInput } from './dto/update-image-input.dto';
 
 @ApiTags('image')
 @Controller('image')
@@ -30,5 +31,13 @@ export class ImageController {
   @Post()
   create(@Body() createImageInput: CreateImageInput): Promise<Image> {
     return this.imageService.create(createImageInput);
+  }
+
+  @Put(':uid')
+  update(
+    @Param() findOneImageInput: FindOneImageInput,
+    @Body() updateImageInput: UpdateImageInput
+  ): Promise<Image> {
+    return this.imageService.update(findOneImageInput, updateImageInput);
   }
 }
