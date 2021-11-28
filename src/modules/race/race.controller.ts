@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { RaceService } from './race.service';
@@ -7,6 +7,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { FindAllRacesInput } from './dto/find-all-races-input.dto';
 import { FindOneRaceInput } from './dto/find-one-race-input.dto';
 import { CreateRaceInput } from './dto/create-race-input.dto';
+import { UpdateRaceInput } from './dto/update-race-input.dto';
 
 @ApiTags('race')
 @Controller('race')
@@ -28,5 +29,13 @@ export class RaceController {
   @Post()
   create(@Body() createRaceInput: CreateRaceInput): Promise<Race> {
     return this.raceService.create(createRaceInput);
+  }
+
+  @Put(':uid')
+  update(
+    @Param() findOneRaceInput: FindOneRaceInput,
+    @Body() updateRaceInput: UpdateRaceInput
+  ): Promise<Race> {
+    return this.raceService.update(findOneRaceInput, updateRaceInput);
   }
 }
