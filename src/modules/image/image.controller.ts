@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ImageService } from './image.service';
@@ -39,5 +48,10 @@ export class ImageController {
     @Body() updateImageInput: UpdateImageInput
   ): Promise<Image> {
     return this.imageService.update(findOneImageInput, updateImageInput);
+  }
+
+  @Delete(':uid')
+  delete(@Param() findOneImageInput: FindOneImageInput): Promise<Image> {
+    return this.imageService.delete(findOneImageInput);
   }
 }
