@@ -94,4 +94,17 @@ export class ImageService {
     const saved = await this.imageRepository.save(preloaded);
     return saved;
   }
+
+  public async delete(findOneImageInput: FindOneImageInput): Promise<Image> {
+    const { uid } = findOneImageInput;
+
+    const existing = await this.findOne({
+      uid,
+      checkIfExists: true
+    });
+
+    const deleted = await this.imageRepository.remove(existing);
+
+    return deleted;
+  }
 }
