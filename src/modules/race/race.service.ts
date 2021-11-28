@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
 import { Race } from './race.entity';
 import { FindAllRacesInput } from './dto/find-all-races-input.dto';
 import { FindOneRaceInput } from './dto/find-one-race-input.dto';
+import { CreateRaceInput } from './dto/create-race-input.dto';
 
 @Injectable()
 export class RaceService {
@@ -44,5 +49,22 @@ export class RaceService {
     }
 
     return item || null;
+  }
+
+  public async create(createRaceInput: CreateRaceInput): Promise<Race> {
+    const { name } = createRaceInput;
+
+    const existing = await this.raceRepository
+      .createQueryBuilder('r')
+      .where('upper(r.name) = upper(:name)', { name })
+      .getOne();
+
+    if (existing) {
+      throw new ConflictException(`already exists a race with name ${name}`);
+    }
+
+    const created = this.raceRepository.create(createRaceInput);
+    const saved = await this.raceRepository.save(created);
+    return saved;
   }
 }
