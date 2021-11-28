@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
-import { FindAllRacesInput } from './dto/find-all-races-input.dto';
 import { Race } from './race.entity';
+import { FindAllRacesInput } from './dto/find-all-races-input.dto';
+import { FindOneRaceInput } from './dto/find-one-race-input.dto';
 
 @Injectable()
 export class RaceService {
@@ -29,5 +30,19 @@ export class RaceService {
     });
 
     return items;
+  }
+
+  public async findOne(
+    findOneRaceInput: FindOneRaceInput
+  ): Promise<Race | null> {
+    const { uid, checkIfExists = false } = findOneRaceInput;
+
+    const item = await this.raceRepository.findOne({ where: { uid } });
+
+    if (checkIfExists && !item) {
+      throw new NotFoundException(`can't get the race with uuid ${uid}.`);
+    }
+
+    return item || null;
   }
 }
