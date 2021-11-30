@@ -41,12 +41,17 @@ export class AssignedImage {
 
   @ManyToOne(
     () => Character,
-    (character: Character) => character.assignedImages
+    (character: Character) => character.assignedImages,
+    {
+      nullable: false
+    }
   )
   @JoinColumn({ name: 'character_id' })
   character: Character;
 
-  @ManyToOne(() => Image, (image: Image) => image.assignedImages)
+  @ManyToOne(() => Image, (image: Image) => image.assignedImages, {
+    nullable: false
+  })
   @JoinColumn({ name: 'image_id' })
   image: Image;
 }
