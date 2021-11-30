@@ -8,6 +8,7 @@ import { CharacterService } from './character.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Character])],
   controllers: [CharacterController],
-  providers: [CharacterService]
+  providers: [CharacterService],
+  exports: [CharacterService]
 })
 export class CharacterModule {}
