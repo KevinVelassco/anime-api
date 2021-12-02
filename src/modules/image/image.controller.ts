@@ -6,17 +6,21 @@ import {
   Param,
   Post,
   Put,
-  Query
+  Query,
+  UploadedFiles,
+  UseInterceptors
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ImageService } from './image.service';
 import { Image } from './image.entity';
 import { Public } from '../../common/decorators/public.decorator';
+import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { FindAllImagesInput } from './dto/find-all-images-input.dto';
 import { FindOneImageInput } from './dto/find-one-image-input.dto';
 import { CreateImageInput } from './dto/create-image-input.dto';
 import { UpdateImageInput } from './dto/update-image-input.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('image')
 @Controller('image')
@@ -53,5 +57,11 @@ export class ImageController {
   @Delete(':uid')
   delete(@Param() findOneImageInput: FindOneImageInput): Promise<Image> {
     return this.imageService.delete(findOneImageInput);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FilesInterceptor('files'))
+  uploadImages(@UploadedFiles() files: Array<UploadFile>): Promise<Image[]> {
+    return this.imageService.uploadImages(files);
   }
 }
