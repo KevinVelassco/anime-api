@@ -4,7 +4,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Generated,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
@@ -23,13 +22,16 @@ export class Image {
   id: number;
 
   @ApiProperty()
-  @Column()
-  @Generated('uuid')
+  @Column({ type: 'varchar', length: 50 })
   uid: string;
 
   @ApiProperty()
   @Column({ type: 'varchar', length: 400 })
   url: string;
+
+  @ApiProperty()
+  @Column({ name: 'cloud_id', type: 'varchar', length: 50, nullable: true })
+  cloudId?: string;
 
   @Exclude()
   @ApiProperty()
