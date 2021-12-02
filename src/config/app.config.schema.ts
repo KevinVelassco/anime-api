@@ -11,5 +11,10 @@ export default Joi.object({
   DATABASE_PORT: Joi.number().default(5432),
   DATABASE_USER: Joi.required(),
   DATABASE_PASSWORD: Joi.required(),
-  DATABASE_NAME: Joi.required()
+  DATABASE_NAME: Joi.required(),
+
+  /* CLOUDINARY */
+  CLOUDINARY_CLOUD_NAME: Joi.required(),
+  CLOUDINARY_API_KEY: Joi.required(),
+  CLOUDINARY_API_SECRET: Joi.required()
 });
