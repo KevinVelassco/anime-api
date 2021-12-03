@@ -121,6 +121,16 @@ export class ImageService {
       checkIfExists: true
     });
 
+    try {
+      const { result } = await cloudinary.uploader.destroy(existing.cloudId);
+
+      if (result !== 'ok') throw new ConflictException();
+    } catch (error) {
+      throw new ConflictException(
+        'Something is wrong with deleting the image!'
+      );
+    }
+
     const deleted = await this.imageRepository.remove(existing);
 
     return deleted;
