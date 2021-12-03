@@ -19,8 +19,6 @@ import { Image } from './image.entity';
 import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { FindAllImagesInput } from './dto/find-all-images-input.dto';
 import { FindOneImageInput } from './dto/find-one-image-input.dto';
-import { CreateImageInput } from './dto/create-image-input.dto';
-import { UpdateImageInput } from './dto/update-image-input.dto';
 
 @Injectable()
 export class ImageService {
@@ -63,54 +61,6 @@ export class ImageService {
     }
 
     return item || null;
-  }
-
-  public async create(createImageInput: CreateImageInput): Promise<Image> {
-    const { url } = createImageInput;
-
-    const existingByUrl = await this.imageRepository
-      .createQueryBuilder('i')
-      .where('i.url = :url', { url })
-      .getOne();
-
-    if (existingByUrl) {
-      throw new ConflictException(`already exists a image with url ${url}`);
-    }
-
-    const created = this.imageRepository.create(createImageInput);
-    const saved = await this.imageRepository.save(created);
-    return saved;
-  }
-
-  public async update(
-    findOneImageInput: FindOneImageInput,
-    updateImageInput: UpdateImageInput
-  ): Promise<Image> {
-    const { uid } = findOneImageInput;
-
-    const existing = await this.findOne({
-      uid,
-      checkIfExists: true
-    });
-
-    const { url } = updateImageInput;
-
-    const existingByUrl = await this.imageRepository
-      .createQueryBuilder('i')
-      .where('i.url = :url', { url })
-      .getOne();
-
-    if (existingByUrl) {
-      throw new ConflictException(`already exists a image with url ${url}`);
-    }
-
-    const preloaded = await this.imageRepository.preload({
-      id: existing.id,
-      url
-    });
-
-    const saved = await this.imageRepository.save(preloaded);
-    return saved;
   }
 
   public async delete(findOneImageInput: FindOneImageInput): Promise<Image> {
