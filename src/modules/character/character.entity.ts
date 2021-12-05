@@ -65,10 +65,6 @@ export class Character {
   @Column({ type: 'varchar', length: 50 })
   origin: string;
 
-  @ApiProperty()
-  @Column({ type: 'varchar', length: 400, nullable: true })
-  image?: string;
-
   @Exclude()
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
