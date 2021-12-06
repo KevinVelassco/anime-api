@@ -22,16 +22,25 @@ export class CharacterService {
 
     if (where.name) where = { ...filters, name: ILike(`%${filters.name}%`) };
 
-    const items = await this.characterRepository.findAndCount({
-      where,
-      take: limit,
-      skip,
-      order: {
-        id: 'DESC'
-      }
-    });
+    const [characters, charactersCount] =
+      await this.characterRepository.findAndCount({
+        where,
+        take: limit,
+        skip,
+        order: {
+          id: 'DESC'
+        },
+        relations: ['assignedImages', 'assignedImages.image']
+      });
 
-    return items;
+    const items = characters.map(
+      ({ assignedImages, id, updatedAt, createdAt, ...character }) => {
+        const image = assignedImages.map(assignedImage => assignedImage.image);
+        return { ...character, image };
+      }
+    );
+
+    return [items, charactersCount];
   }
 
   public async findOne(
