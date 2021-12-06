@@ -38,15 +38,23 @@ export class ImageService {
   public async findAll(findAllImagesInput: FindAllImagesInput): Promise<any> {
     const { limit = 10, skip = 0 } = findAllImagesInput;
 
-    const items = await this.imageRepository.findAndCount({
+    const [images, imagesCount] = await this.imageRepository.findAndCount({
       take: limit,
       skip,
       order: {
         id: 'DESC'
-      }
+      },
+      relations: ['assignedImages', 'assignedImages.character']
     });
 
-    return items;
+    const items = images.map(({ uid, url, assignedImages }) => {
+      const character = assignedImages.map(
+        assignedImage => assignedImage.character
+      );
+      return { uid, url, character };
+    });
+
+    return [items, imagesCount];
   }
 
   public async findOne(
