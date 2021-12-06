@@ -11,6 +11,5 @@ export class AssignImageToCharacterInput {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @IsUUID()
   readonly imageUid: string;
 }
