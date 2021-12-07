@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../common/decorators/public.decorator';
@@ -6,6 +6,7 @@ import { CharacterService } from './character.service';
 import { Character } from './character.entity';
 import { FindAllCharactersInput } from './dto/find-all-characters-input.dto';
 import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
+import { CreateCharacterInput } from './dto/create-character-input.dto';
 
 @ApiTags('character')
 @Controller('character')
@@ -26,5 +27,12 @@ export class CharacterController {
     @Param() findOneCharacterInput: FindOneCharacterInput
   ): Promise<Character | null> {
     return this.characterService.findOne(findOneCharacterInput);
+  }
+
+  @Post()
+  create(
+    @Body() createCharacterInput: CreateCharacterInput
+  ): Promise<Character> {
+    return this.characterService.create(createCharacterInput);
   }
 }
