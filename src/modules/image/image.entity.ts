@@ -29,6 +29,7 @@ export class Image {
   @Column({ type: 'varchar', length: 400 })
   url: string;
 
+  @Exclude()
   @ApiProperty()
   @Column({ name: 'cloud_id', type: 'varchar', length: 50, nullable: true })
   cloudId?: string;

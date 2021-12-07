@@ -19,6 +19,7 @@ import { Image } from './image.entity';
 import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { FindAllImagesInput } from './dto/find-all-images-input.dto';
 import { FindOneImageInput } from './dto/find-one-image-input.dto';
+import { GetImageByUidInput } from './dto/get-image-by-uid-input.dto';
 
 @Injectable()
 export class ImageService {
@@ -62,6 +63,35 @@ export class ImageService {
   ): Promise<Image | null> {
     const { uid, checkIfExists = false } = findOneImageInput;
 
+    const image = await this.imageRepository.findOne({
+      where: { uid },
+      relations: ['assignedImages', 'assignedImages.character']
+    });
+
+    if (checkIfExists && !image) {
+      throw new NotFoundException(`can't get the image with uuid ${uid}.`);
+    }
+
+    let item;
+
+    if (image) {
+      const character = image.assignedImages.map(assignedImage => {
+        const { id, createdAt, updatedAt, ...data } = assignedImage.character;
+
+        return data;
+      });
+
+      item = { uid: image.uid, url: image.url, character };
+    }
+
+    return item || null;
+  }
+
+  public async getImageByUid(
+    getImageByUidInput: GetImageByUidInput
+  ): Promise<Image | null> {
+    const { uid, checkIfExists = false } = getImageByUidInput;
+
     const item = await this.imageRepository.findOne({ where: { uid } });
 
     if (checkIfExists && !item) {
@@ -74,7 +104,7 @@ export class ImageService {
   public async delete(findOneImageInput: FindOneImageInput): Promise<Image> {
     const { uid } = findOneImageInput;
 
-    const existing = await this.findOne({
+    const existing = await this.getImageByUid({
       uid,
       checkIfExists: true
     });
