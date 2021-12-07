@@ -47,6 +47,10 @@ export class Character {
   name: string;
 
   @ApiProperty()
+  @Column({ type: 'text' })
+  description: string;
+
+  @ApiProperty()
   @Column({
     type: 'enum',
     enum: CharacterStatus,
