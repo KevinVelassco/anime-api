@@ -26,14 +26,14 @@ export class AssignedImageService {
   ): Promise<AssignedImage> {
     const { characterUid } = assignImageToCharacterInput;
 
-    const character = await this.characterService.findOne({
+    const character = await this.characterService.getCharacterByUid({
       uid: characterUid,
       checkIfExists: true
     });
 
     const { imageUid } = assignImageToCharacterInput;
 
-    const image = await this.imageService.findOne({
+    const image = await this.imageService.getImageByUid({
       uid: imageUid,
       checkIfExists: true
     });
@@ -64,14 +64,14 @@ export class AssignedImageService {
   ): Promise<AssignedImage> {
     const { characterUid } = removeAssignedImageFromCharacterInput;
 
-    const character = await this.characterService.findOne({
+    const character = await this.characterService.getCharacterByUid({
       uid: characterUid,
       checkIfExists: true
     });
 
     const { imageUid } = removeAssignedImageFromCharacterInput;
 
-    const image = await this.imageService.findOne({
+    const image = await this.imageService.getImageByUid({
       uid: imageUid,
       checkIfExists: true
     });
