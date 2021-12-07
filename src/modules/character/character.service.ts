@@ -5,13 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { RaceService } from '../race/race.service';
 
+import { RaceService } from '../race/race.service';
 import { Character } from './character.entity';
 import { CreateCharacterInput } from './dto/create-character-input.dto';
 import { FindAllCharactersInput } from './dto/find-all-characters-input.dto';
 import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
 import { GetCharacterByUidInput } from './dto/get-character-by-uid-input.dto';
+import { UpdateCharacterInput } from './dto/update-character-input.dto';
 
 @Injectable()
 export class CharacterService {
@@ -38,7 +39,7 @@ export class CharacterService {
         order: {
           id: 'DESC'
         },
-        relations: ['assignedImages', 'assignedImages.image']
+        relations: ['race', 'assignedImages', 'assignedImages.image']
       });
 
     const items = characters.map(
@@ -122,6 +123,54 @@ export class CharacterService {
     });
 
     const saved = await this.characterRepository.save(created);
+
+    return saved;
+  }
+
+  public async update(
+    getCharacterByUidInput: GetCharacterByUidInput,
+    updateCharacterInput: UpdateCharacterInput
+  ): Promise<Character> {
+    const { uid } = getCharacterByUidInput;
+
+    const existing = await this.getCharacterByUid({
+      uid,
+      checkIfExists: true
+    });
+
+    const { name } = updateCharacterInput;
+
+    if (name) {
+      const existingByName = await this.characterRepository
+        .createQueryBuilder('c')
+        .where('upper(c.name) = upper(:name)', { name })
+        .getOne();
+
+      if (existingByName) {
+        throw new ConflictException(
+          `already exists a character with name ${name}`
+        );
+      }
+    }
+
+    const { raceUid } = updateCharacterInput;
+
+    let race;
+
+    if (raceUid) {
+      race = await this.raceService.findOne({
+        uid: raceUid,
+        checkIfExists: true
+      });
+    }
+
+    const updated = await this.characterRepository.preload({
+      id: existing.id,
+      ...updateCharacterInput,
+      race
+    });
+
+    const saved = await this.characterRepository.save(updated);
 
     return saved;
   }
