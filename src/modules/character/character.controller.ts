@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../../common/decorators/public.decorator';
@@ -47,5 +56,12 @@ export class CharacterController {
       getCharacterByUidInput,
       updateCharacterInput
     );
+  }
+
+  @Delete(':uid')
+  delete(
+    @Param() findOneCharacterInput: FindOneCharacterInput
+  ): Promise<Character> {
+    return this.characterService.delete(findOneCharacterInput);
   }
 }
