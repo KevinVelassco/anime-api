@@ -43,9 +43,9 @@ export class CharacterService {
       });
 
     const items = characters.map(
-      ({ assignedImages, id, updatedAt, createdAt, ...character }) => {
+      ({ assignedImages, id, updatedAt, createdAt, race, ...character }) => {
         const image = assignedImages.map(assignedImage => assignedImage.image);
-        return { ...character, image };
+        return { ...character, race: race?.name, image };
       }
     );
 
@@ -59,7 +59,7 @@ export class CharacterService {
 
     const character = await this.characterRepository.findOne({
       where: { uid },
-      relations: ['assignedImages', 'assignedImages.image']
+      relations: ['race', 'assignedImages', 'assignedImages.image']
     });
 
     if (checkIfExists && !character) {
@@ -74,9 +74,10 @@ export class CharacterService {
         url: image.url
       }));
 
-      const { id, createdAt, updatedAt, assignedImages, ...data } = character;
+      const { id, createdAt, updatedAt, assignedImages, race, ...data } =
+        character;
 
-      item = { ...data, image };
+      item = { ...data, race: race?.name, image };
     }
 
     return item || null;
@@ -173,5 +174,20 @@ export class CharacterService {
     const saved = await this.characterRepository.save(updated);
 
     return saved;
+  }
+
+  public async delete(
+    findOneCharacterInput: FindOneCharacterInput
+  ): Promise<Character> {
+    const { uid } = findOneCharacterInput;
+
+    const existing = await this.getCharacterByUid({
+      uid,
+      checkIfExists: true
+    });
+
+    const deleted = await this.characterRepository.remove(existing);
+
+    return deleted;
   }
 }
