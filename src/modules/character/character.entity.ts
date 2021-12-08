@@ -79,7 +79,7 @@ export class Character {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Race, (race: Race) => race.characters)
+  @ManyToOne(() => Race, (race: Race) => race.characters, { nullable: false })
   @JoinColumn({ name: 'race_id' })
   race: Race;
 
