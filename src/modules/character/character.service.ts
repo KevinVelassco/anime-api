@@ -12,6 +12,7 @@ import { CreateCharacterInput } from './dto/create-character-input.dto';
 import { FindAllCharactersInput } from './dto/find-all-characters-input.dto';
 import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
 import { GetCharacterByUidInput } from './dto/get-character-by-uid-input.dto';
+import { GetCharactersByRaceInput } from './dto/get-characters-by-race-input.dto';
 import { UpdateCharacterInput } from './dto/update-character-input.dto';
 
 @Injectable()
@@ -189,5 +190,43 @@ export class CharacterService {
     const deleted = await this.characterRepository.remove(existing);
 
     return deleted;
+  }
+
+  public async getCharactersByRace(
+    getCharactersByRaceInput: GetCharactersByRaceInput,
+    findAllCharactersInput: FindAllCharactersInput
+  ): Promise<any> {
+    const { raceUid } = getCharactersByRaceInput;
+
+    const race = await this.raceService.findOne({
+      uid: raceUid,
+      checkIfExists: true
+    });
+
+    const { limit = 10, skip = 0, ...filters } = findAllCharactersInput;
+
+    let where: any = { ...filters, race };
+
+    if (where.name) where = { ...where, name: ILike(`%${filters.name}%`) };
+
+    const [characters, charactersCount] =
+      await this.characterRepository.findAndCount({
+        where,
+        take: limit,
+        skip,
+        order: {
+          id: 'DESC'
+        },
+        relations: ['assignedImages', 'assignedImages.image']
+      });
+
+    const items = characters.map(
+      ({ assignedImages, id, updatedAt, createdAt, ...character }) => {
+        const image = assignedImages.map(assignedImage => assignedImage.image);
+        return { ...character, image };
+      }
+    );
+
+    return [items, charactersCount];
   }
 }
