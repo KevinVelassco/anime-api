@@ -34,11 +34,6 @@ export class FindAllCharactersInput {
 
   @ApiProperty()
   @IsOptional()
-  @IsString()
-  readonly species?: string;
-
-  @ApiProperty()
-  @IsOptional()
   @IsEnum(CharacterGender)
   readonly gender?: CharacterGender;
 }
