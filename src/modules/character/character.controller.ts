@@ -18,6 +18,7 @@ import { FindOneCharacterInput } from './dto/find-one-character-input.dto';
 import { CreateCharacterInput } from './dto/create-character-input.dto';
 import { GetCharacterByUidInput } from './dto/get-character-by-uid-input.dto';
 import { UpdateCharacterInput } from './dto/update-character-input.dto';
+import { GetCharactersByRaceInput } from './dto/get-characters-by-race-input.dto';
 
 @ApiTags('character')
 @Controller('character')
@@ -63,5 +64,17 @@ export class CharacterController {
     @Param() findOneCharacterInput: FindOneCharacterInput
   ): Promise<Character> {
     return this.characterService.delete(findOneCharacterInput);
+  }
+
+  @Public()
+  @Get('race/:raceUid')
+  getCharactersByRace(
+    @Param() getCharactersByRaceInput: GetCharactersByRaceInput,
+    @Query() findAllCharactersInput: FindAllCharactersInput
+  ): Promise<any> {
+    return this.characterService.getCharactersByRace(
+      getCharactersByRaceInput,
+      findAllCharactersInput
+    );
   }
 }
