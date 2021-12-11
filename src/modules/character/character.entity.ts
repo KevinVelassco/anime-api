@@ -85,7 +85,7 @@ export class Character {
   race: Race;
 
   @ManyToOne(() => Origin, (origin: Origin) => origin.characters, {
-    nullable: true
+    nullable: false
   })
   @JoinColumn({ name: 'origin_id' })
   origin: Origin;
