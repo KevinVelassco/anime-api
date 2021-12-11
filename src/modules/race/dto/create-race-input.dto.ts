@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class CreateRaceInput {
   @ApiProperty()
@@ -7,4 +7,10 @@ export class CreateRaceInput {
   @IsString()
   @MaxLength(50)
   readonly name: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @IsUrl()
+  readonly image: string;
 }
