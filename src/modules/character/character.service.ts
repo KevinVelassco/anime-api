@@ -42,13 +42,13 @@ export class CharacterService {
         order: {
           id: 'DESC'
         },
-        relations: ['race', 'assignedImages', 'assignedImages.image']
+        relations: ['race', 'origin', 'assignedImages', 'assignedImages.image']
       });
 
     const items = characters.map(
-      ({ assignedImages, id, updatedAt, createdAt, race, ...character }) => {
+      ({ assignedImages, id, updatedAt, createdAt, ...character }) => {
         const image = assignedImages.map(assignedImage => assignedImage.image);
-        return { ...character, race: race?.name, image };
+        return { ...character, image };
       }
     );
 
