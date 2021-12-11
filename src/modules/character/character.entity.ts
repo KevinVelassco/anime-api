@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 
 import { AssignedImage } from '../assigned-image/assigned-image.entity';
+import { Origin } from '../origin/origin.entity';
 import { Race } from '../race/race.entity';
 
 export enum CharacterStatus {
@@ -66,10 +67,6 @@ export class Character {
   gender: CharacterGender;
 
   @ApiProperty()
-  @Column({ type: 'varchar', length: 50 })
-  origin: string;
-
-  @ApiProperty()
   @Column({ name: 'profile_image', type: 'varchar', length: 400 })
   profileImage: string;
 
@@ -86,6 +83,12 @@ export class Character {
   @ManyToOne(() => Race, (race: Race) => race.characters, { nullable: false })
   @JoinColumn({ name: 'race_id' })
   race: Race;
+
+  @ManyToOne(() => Origin, (origin: Origin) => origin.characters, {
+    nullable: true
+  })
+  @JoinColumn({ name: 'origin_id' })
+  origin: Origin;
 
   @OneToMany(
     () => AssignedImage,

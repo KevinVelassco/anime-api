@@ -16,6 +16,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ImageModule } from './modules/image/image.module';
 import { AssignedImageModule } from './modules/assigned-image/assigned-image.module';
 import { RaceModule } from './modules/race/race.module';
+import { OriginModule } from './modules/origin/origin.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -54,7 +55,8 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     CharacterModule,
     ImageModule,
     AssignedImageModule,
-    RaceModule
+    RaceModule,
+    OriginModule
   ],
   controllers: [AppController],
   providers: [AppService]

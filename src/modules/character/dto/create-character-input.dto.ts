@@ -41,7 +41,8 @@ export class CreateCharacterInput {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  readonly origin: string;
+  @IsUUID()
+  readonly originUid: string;
 
   @ApiProperty()
   @IsNotEmpty()
