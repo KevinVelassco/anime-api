@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   MaxLength
 } from 'class-validator';
@@ -30,6 +31,12 @@ export class CreateCharacterInput {
   @IsNotEmpty()
   @IsEnum(CharacterGender)
   readonly gender: CharacterGender;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @IsUrl()
+  readonly profileImage: string;
 
   @ApiProperty()
   @IsNotEmpty()
