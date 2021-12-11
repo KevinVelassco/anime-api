@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
+import { OriginService } from '../origin/origin.service';
 
 import { RaceService } from '../race/race.service';
 import { Character } from './character.entity';
@@ -20,7 +21,8 @@ export class CharacterService {
   constructor(
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
-    private readonly raceService: RaceService
+    private readonly raceService: RaceService,
+    private readonly originService: OriginService
   ) {}
 
   public async findAll(
@@ -101,7 +103,7 @@ export class CharacterService {
   public async create(
     createCharacterInput: CreateCharacterInput
   ): Promise<Character> {
-    const { raceUid, name } = createCharacterInput;
+    const { name, raceUid, originUid } = createCharacterInput;
 
     const existingByName = await this.characterRepository
       .createQueryBuilder('c')
@@ -119,9 +121,15 @@ export class CharacterService {
       checkIfExists: true
     });
 
+    const origin = await this.originService.findOne({
+      uid: originUid,
+      checkIfExists: true
+    });
+
     const created = this.characterRepository.create({
       ...createCharacterInput,
-      race
+      race,
+      origin
     });
 
     const saved = await this.characterRepository.save(created);
@@ -166,10 +174,22 @@ export class CharacterService {
       });
     }
 
+    const { originUid } = updateCharacterInput;
+
+    let origin;
+
+    if (originUid) {
+      origin = await this.originService.findOne({
+        uid: originUid,
+        checkIfExists: true
+      });
+    }
+
     const updated = await this.characterRepository.preload({
       id: existing.id,
       ...updateCharacterInput,
-      race
+      race,
+      origin
     });
 
     const saved = await this.characterRepository.save(updated);
