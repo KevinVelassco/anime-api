@@ -31,6 +31,10 @@ export class Race {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
+  @ApiProperty()
+  @Column({ type: 'varchar', length: 400 })
+  image: string;
+
   @Exclude()
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
