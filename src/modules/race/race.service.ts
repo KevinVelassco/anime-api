@@ -93,7 +93,7 @@ export class RaceService {
 
     const preloaded = await this.raceRepository.preload({
       id: existing.id,
-      name
+      ...updateRaceInput
     });
 
     const saved = await this.raceRepository.save(preloaded);
