@@ -38,6 +38,11 @@ export class Origin {
 
   @Exclude()
   @ApiProperty()
+  @Column({ name: 'cloud_id', type: 'varchar', length: 50, nullable: true })
+  cloudId?: string;
+
+  @Exclude()
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
