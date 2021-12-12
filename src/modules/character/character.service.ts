@@ -237,7 +237,7 @@ export class CharacterService {
         order: {
           id: 'DESC'
         },
-        relations: ['assignedImages', 'assignedImages.image']
+        relations: ['origin', 'assignedImages', 'assignedImages.image']
       });
 
     const items = characters.map(
