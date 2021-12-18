@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseInterceptors
@@ -18,6 +19,7 @@ import { FindOneOriginInput } from './dto/find-one-origin-input.dto';
 import { FindAllOriginsInput } from './dto/find-all-origins-input.dto';
 import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { CreateOriginInput } from './dto/create-origin-input-dto';
+import { UpdateOriginInput } from './dto/update-origin-input-dto';
 
 @ApiTags('origin')
 @Controller('origin')
@@ -45,5 +47,19 @@ export class OriginController {
     @UploadedFile() file: UploadFile
   ): Promise<Origin> {
     return this.originService.create(createOriginInput, file);
+  }
+
+  @Put(':uid')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @Param() findOneOriginInput: FindOneOriginInput,
+    @Body() updateOriginInput: UpdateOriginInput,
+    @UploadedFile() file: UploadFile
+  ): Promise<Origin> {
+    return this.originService.update(
+      findOneOriginInput,
+      updateOriginInput,
+      file
+    );
   }
 }
