@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -61,5 +62,10 @@ export class OriginController {
       updateOriginInput,
       file
     );
+  }
+
+  @Delete(':uid')
+  delete(@Param() findOneOriginInput: FindOneOriginInput): Promise<Origin> {
+    return this.originService.delete(findOneOriginInput);
   }
 }
