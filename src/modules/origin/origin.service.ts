@@ -248,4 +248,25 @@ export class OriginService {
 
     return saved;
   }
+
+  public async delete(findOneOriginInput: FindOneOriginInput): Promise<Origin> {
+    const existing = await this.findOne({
+      ...findOneOriginInput,
+      checkIfExists: true
+    });
+
+    try {
+      const { result } = await cloudinary.uploader.destroy(existing.cloudId);
+
+      if (result !== 'ok') throw new ConflictException();
+    } catch (error) {
+      throw new ConflictException(
+        'Something is wrong with deleting the image!'
+      );
+    }
+
+    const deleted = await this.originRepository.remove(existing);
+
+    return deleted;
+  }
 }
