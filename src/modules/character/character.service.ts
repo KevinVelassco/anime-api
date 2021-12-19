@@ -4,6 +4,7 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { ILike, Repository } from 'typeorm';
 import { OriginService } from '../origin/origin.service';
 
@@ -63,7 +64,7 @@ export class CharacterService {
 
     const character = await this.characterRepository.findOne({
       where: { uid },
-      relations: ['race', 'assignedImages', 'assignedImages.image']
+      relations: ['race', 'origin', 'assignedImages', 'assignedImages.image']
     });
 
     if (checkIfExists && !character) {
@@ -78,10 +79,9 @@ export class CharacterService {
         url: image.url
       }));
 
-      const { id, createdAt, updatedAt, assignedImages, race, ...data } =
-        character;
+      const { assignedImages, ...data } = character;
 
-      item = { ...data, race: race?.name, image };
+      item = plainToClass(Character, { ...data, image });
     }
 
     return item || null;
