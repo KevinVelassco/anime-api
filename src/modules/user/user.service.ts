@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserInput } from './dtos/create-user-input.dto';
-import { GetUserByEmailInput } from './dtos/get-user-by-email-input.dto';
+
+import { CreateUserInput } from './dto/create-user-input.dto';
+import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
 import { User } from './user.entity';
 
 @Injectable()

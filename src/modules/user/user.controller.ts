@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { CreateUserInput } from './dtos/create-user-input.dto';
+import { CreateUserInput } from './dto/create-user-input.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
