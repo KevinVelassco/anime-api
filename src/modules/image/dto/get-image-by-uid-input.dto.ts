@@ -10,5 +10,5 @@ export class GetImageByUidInput {
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
-  checkIfExists?: boolean;
+  readonly checkIfExists?: boolean;
 }

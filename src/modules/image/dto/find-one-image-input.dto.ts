@@ -10,5 +10,5 @@ export class FindOneImageInput {
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
-  checkIfExists?: boolean;
+  readonly checkIfExists?: boolean;
 }

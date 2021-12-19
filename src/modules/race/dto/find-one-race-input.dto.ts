@@ -17,5 +17,5 @@ export class FindOneRaceInput {
   @ApiProperty()
   @IsOptional()
   @IsBoolean()
-  checkIfExists?: boolean;
+  readonly checkIfExists?: boolean;
 }
