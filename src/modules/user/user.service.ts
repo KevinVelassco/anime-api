@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateUserInput } from './dto/create-user-input.dto';
+import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
 import { User } from './user.entity';
 
@@ -12,6 +13,31 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
   ) {}
+
+  public async findOne(
+    findOneUserInput: FindOneUserInput
+  ): Promise<User | null> {
+    const { uid, checkIfExists = false } = findOneUserInput;
+
+    const item = await this.userRepository.findOne({
+      select: [
+        'uid',
+        'name',
+        'email',
+        'isAdmin',
+        'createdAt',
+        'updatedAt',
+        'deletedAt'
+      ],
+      where: { uid }
+    });
+
+    if (checkIfExists && !item) {
+      throw new NotFoundException(`can't get the user with uuid ${uid}.`);
+    }
+
+    return item || null;
+  }
 
   public async create(createUserInput: CreateUserInput): Promise<User> {
     const { email } = createUserInput;
