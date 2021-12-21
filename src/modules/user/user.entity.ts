@@ -40,6 +40,11 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   password: string;
 
+  @Exclude()
+  @ApiProperty()
+  @Column({ name: 'is_admin', type: 'boolean', default: false })
+  isAdmin: boolean;
+
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
