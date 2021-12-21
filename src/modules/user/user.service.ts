@@ -72,8 +72,11 @@ export class UserService {
       throw new NotFoundException(`already exists a user with email ${email}`);
     }
 
+    const { isAdmin = false } = createUserInput;
+
     const created = this.userRepository.create({
-      ...createUserInput
+      ...createUserInput,
+      isAdmin
     });
 
     created.hashPassword();
