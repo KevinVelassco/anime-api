@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { CreateUserInput } from './dto/create-user-input.dto';
@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { Admin } from '../../common/decorators/admin.decorator';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
+import { FindAllUsersInput } from './dto/find-all-users-input.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -13,6 +14,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Admin()
+  @Get()
+  findAll(@Query() findAllUsersInput: FindAllUsersInput): Promise<any> {
+    return this.userService.findAll(findAllUsersInput);
+  }
+
   @Get(':uid')
   findOne(@Param() findOneUserInput: FindOneUserInput): Promise<User | null> {
     return this.userService.findOne(findOneUserInput);
