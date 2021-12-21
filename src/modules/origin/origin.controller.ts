@@ -21,6 +21,7 @@ import { FindAllOriginsInput } from './dto/find-all-origins-input.dto';
 import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { CreateOriginInput } from './dto/create-origin-input-dto';
 import { UpdateOriginInput } from './dto/update-origin-input-dto';
+import { Admin } from '../../common/decorators/admin.decorator';
 
 @ApiTags('origin')
 @Controller('origin')
@@ -41,6 +42,7 @@ export class OriginController {
     return this.originService.findOne(findOneOriginInput);
   }
 
+  @Admin()
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   create(
@@ -50,6 +52,7 @@ export class OriginController {
     return this.originService.create(createOriginInput, file);
   }
 
+  @Admin()
   @Put(':uid')
   @UseInterceptors(FileInterceptor('file'))
   update(
@@ -64,6 +67,7 @@ export class OriginController {
     );
   }
 
+  @Admin()
   @Delete(':uid')
   delete(@Param() findOneOriginInput: FindOneOriginInput): Promise<Origin> {
     return this.originService.delete(findOneOriginInput);

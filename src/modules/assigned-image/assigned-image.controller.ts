@@ -5,6 +5,7 @@ import { AssignedImage } from './assigned-image.entity';
 import { AssignedImageService } from './assigned-image.service';
 import { AssignImageToCharacterInput } from './dto/assign-image-to-character-input.dto';
 import { RemoveAssignedImageFromCharacterInput } from './dto/remove-assigned-image-from-character-input.dto';
+import { Admin } from '../../common/decorators/admin.decorator';
 
 @ApiTags('assigned-image')
 @Controller('assigned-image')
@@ -20,6 +21,7 @@ export class AssignedImageController {
     );
   }
 
+  @Admin()
   @Delete()
   removeAssignedImageFromCharacter(
     @Body()

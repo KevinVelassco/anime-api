@@ -17,6 +17,7 @@ import { FindAllRacesInput } from './dto/find-all-races-input.dto';
 import { FindOneRaceInput } from './dto/find-one-race-input.dto';
 import { CreateRaceInput } from './dto/create-race-input.dto';
 import { UpdateRaceInput } from './dto/update-race-input.dto';
+import { Admin } from '../../common/decorators/admin.decorator';
 
 @ApiTags('race')
 @Controller('race')
@@ -48,6 +49,7 @@ export class RaceController {
     return this.raceService.update(findOneRaceInput, updateRaceInput);
   }
 
+  @Admin()
   @Delete(':uid')
   delete(@Param() findOneRaceInput: FindOneRaceInput): Promise<Race> {
     return this.raceService.delete(findOneRaceInput);

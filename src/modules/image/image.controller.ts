@@ -17,6 +17,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { UploadFile } from '../../common/interfaces/upload-file.interface';
 import { FindAllImagesInput } from './dto/find-all-images-input.dto';
 import { FindOneImageInput } from './dto/find-one-image-input.dto';
+import { Admin } from '../../common/decorators/admin.decorator';
 
 @ApiTags('image')
 @Controller('image')
@@ -37,11 +38,13 @@ export class ImageController {
     return this.imageService.findOne(findOneImageInput);
   }
 
+  @Admin()
   @Delete(':uid')
   delete(@Param() findOneImageInput: FindOneImageInput): Promise<Image> {
     return this.imageService.delete(findOneImageInput);
   }
 
+  @Admin()
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files'))
   uploadImages(@UploadedFiles() files: Array<UploadFile>): Promise<Image[]> {

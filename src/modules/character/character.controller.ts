@@ -20,6 +20,7 @@ import { GetCharacterByUidInput } from './dto/get-character-by-uid-input.dto';
 import { UpdateCharacterInput } from './dto/update-character-input.dto';
 import { GetCharactersByRaceInput } from './dto/get-characters-by-race-input.dto';
 import { GetCharactersByOriginInput } from './dto/get-characters-by-origin-input.dto';
+import { Admin } from '../../common/decorators/admin.decorator';
 
 @ApiTags('character')
 @Controller('character')
@@ -42,6 +43,7 @@ export class CharacterController {
     return this.characterService.findOne(findOneCharacterInput);
   }
 
+  @Admin()
   @Post()
   create(
     @Body() createCharacterInput: CreateCharacterInput
@@ -60,6 +62,7 @@ export class CharacterController {
     );
   }
 
+  @Admin()
   @Delete(':uid')
   delete(
     @Param() findOneCharacterInput: FindOneCharacterInput
