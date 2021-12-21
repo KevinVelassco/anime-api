@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 import { CreateUserInput } from './dto/create-user-input.dto';
+import { FindAllUsersInput } from './dto/find-all-users-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
 import { User } from './user.entity';
@@ -13,6 +14,25 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
   ) {}
+
+  public async findAll(findAllUsersInput: FindAllUsersInput): Promise<any> {
+    const { limit = 10, skip = 0, q } = findAllUsersInput;
+
+    let where: any;
+
+    if (q) where = [{ name: ILike(`%${q}%`) }, { email: ILike(`%${q}%`) }];
+
+    const items = await this.userRepository.findAndCount({
+      where,
+      take: limit,
+      skip,
+      order: {
+        id: 'DESC'
+      }
+    });
+
+    return items;
+  }
 
   public async findOne(
     findOneUserInput: FindOneUserInput
