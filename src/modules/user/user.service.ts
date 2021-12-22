@@ -1,12 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
+import { User } from './user.entity';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { FindAllUsersInput } from './dto/find-all-users-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
-import { User } from './user.entity';
+import { UpdateUserInput } from './dto/update-user-input.dto';
 
 @Injectable()
 export class UserService {
@@ -41,6 +46,7 @@ export class UserService {
 
     const item = await this.userRepository.findOne({
       select: [
+        'id',
         'uid',
         'name',
         'email',
@@ -62,14 +68,10 @@ export class UserService {
   public async create(createUserInput: CreateUserInput): Promise<User> {
     const { email } = createUserInput;
 
-    const user = await this.userRepository.findOne({
-      where: {
-        email
-      }
-    });
+    const user = await this.getUserByEmail({ email });
 
     if (user) {
-      throw new NotFoundException(`already exists a user with email ${email}`);
+      throw new ConflictException(`already exists a user with email ${email}`);
     }
 
     const { isAdmin = false } = createUserInput;
@@ -83,6 +85,42 @@ export class UserService {
 
     const saved = await this.userRepository.save(created);
 
+    return saved;
+  }
+
+  public async update(
+    findOneUserInput: FindOneUserInput,
+    updateUserInput: UpdateUserInput
+  ): Promise<User> {
+    const { uid } = findOneUserInput;
+
+    const existing = await this.findOne({
+      uid,
+      checkIfExists: true
+    });
+
+    const { email } = updateUserInput;
+
+    if (email) {
+      const user = await this.getUserByEmail({ email });
+
+      if (user) {
+        throw new ConflictException(
+          `already exists a user with email ${email}`
+        );
+      }
+    }
+
+    const preloaded = await this.userRepository.preload({
+      id: existing.id,
+      ...updateUserInput
+    });
+
+    const { password } = updateUserInput;
+
+    if (password) preloaded.hashPassword();
+
+    const saved = await this.userRepository.save(preloaded);
     return saved;
   }
 
