@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { CreateUserInput } from './dto/create-user-input.dto';
@@ -37,5 +46,11 @@ export class UserController {
     @Body() updateUserInput: UpdateUserInput
   ): Promise<User> {
     return this.userService.update(findOneUserInput, updateUserInput);
+  }
+
+  @Admin()
+  @Delete(':uid')
+  delete(@Param() findOneUserInput: FindOneUserInput): Promise<User> {
+    return this.userService.delete(findOneUserInput);
   }
 }
