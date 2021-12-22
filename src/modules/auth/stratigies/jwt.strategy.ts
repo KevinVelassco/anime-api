@@ -3,6 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 
+import { User } from '../../../modules/user/user.entity';
 import { UserService } from '../../../modules/user/user.service';
 import appConfig from '../../../config/app.config';
 
@@ -22,11 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: any) {
     const { authUid } = payload;
 
-    const user = await this.userService.findOne({
+    const { password, ...user } = await this.userService.findOne({
       uid: authUid,
       checkIfExists: true
     });
 
-    return user;
+    return user as User;
   }
 }

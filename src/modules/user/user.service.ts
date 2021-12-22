@@ -45,16 +45,6 @@ export class UserService {
     const { uid, checkIfExists = false } = findOneUserInput;
 
     const item = await this.userRepository.findOne({
-      select: [
-        'id',
-        'uid',
-        'name',
-        'email',
-        'isAdmin',
-        'createdAt',
-        'updatedAt',
-        'deletedAt'
-      ],
       where: { uid }
     });
 
