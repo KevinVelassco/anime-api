@@ -124,6 +124,19 @@ export class UserService {
     return saved;
   }
 
+  public async delete(findOneUserInput: FindOneUserInput): Promise<User> {
+    const { uid } = findOneUserInput;
+
+    const existing = await this.findOne({
+      uid,
+      checkIfExists: true
+    });
+
+    const deleted = await this.userRepository.softRemove(existing);
+
+    return deleted;
+  }
+
   public async getUserByEmail(
     getUserByEmailInput: GetUserByEmailInput
   ): Promise<User | null> {
