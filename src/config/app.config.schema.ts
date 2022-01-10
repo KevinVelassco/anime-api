@@ -4,6 +4,9 @@ export default Joi.object({
   /* PORT APP */
   PORT: Joi.number().required(),
   ACCESS_TOKEN_SECRET: Joi.required(),
+  ACCESS_TOKEN_EXPIRATION: Joi.required(),
+  REFRESH_TOKEN_SECRET: Joi.required(),
+  REFRESH_TOKEN_EXPIRATION: Joi.required(),
 
   /* DATABASE INFORMATION */
   DATABASE_CLIENT: Joi.required(),

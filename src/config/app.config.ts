@@ -4,7 +4,10 @@ export default registerAs('config', () => ({
   environment: process.env.NODE_ENV || 'local',
   app: {
     port: parseInt(process.env.PORT, 10) || 8080,
-    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
+    accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
+    refreshTokenExpiration: process.env.REFRESH_TOKEN_EXPIRATION
   },
   database: {
     client: process.env.DATABASE_CLIENT,
