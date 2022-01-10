@@ -71,8 +71,6 @@ export class UserService {
       isAdmin
     });
 
-    created.hashPassword();
-
     const saved = await this.userRepository.save(created);
 
     return saved;
@@ -105,10 +103,6 @@ export class UserService {
       id: existing.id,
       ...updateUserInput
     });
-
-    const { password } = updateUserInput;
-
-    if (password) preloaded.hashPassword();
 
     const saved = await this.userRepository.save(preloaded);
     return saved;
