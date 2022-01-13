@@ -30,11 +30,11 @@ export class AuthService {
     return null;
   }
 
-  public login(user: User): Tokens {
+  public async login(user: User): Promise<Tokens> {
     return this.getTokens(user);
   }
 
-  public refreshTokens(user: User): Tokens {
+  public async refreshTokens(user: User): Promise<Tokens> {
     return this.getTokens(user);
   }
 
