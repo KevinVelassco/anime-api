@@ -16,7 +16,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
 @Entity('users')
-@Unique('uq_user_uid', ['uid'])
+@Unique('uq_user_auth_uid', ['authUid'])
 @Unique('uq_user_email', ['email'])
 export class User {
   @Exclude()
@@ -25,9 +25,9 @@ export class User {
   id: number;
 
   @ApiProperty()
-  @Column()
+  @Column({ name: 'auth_uid' })
   @Generated('uuid')
-  uid: string;
+  authUid: string;
 
   @ApiProperty()
   @Column({ type: 'varchar', length: 100 })

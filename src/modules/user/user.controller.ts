@@ -29,7 +29,7 @@ export class UserController {
     return this.userService.findAll(findAllUsersInput);
   }
 
-  @Get(':uid')
+  @Get(':authUid')
   findOne(@Param() findOneUserInput: FindOneUserInput): Promise<User | null> {
     return this.userService.findOne(findOneUserInput);
   }
@@ -40,7 +40,7 @@ export class UserController {
     return this.userService.create(createUserInput);
   }
 
-  @Put(':uid')
+  @Put(':authUid')
   update(
     @Param() findOneUserInput: FindOneUserInput,
     @Body() updateUserInput: UpdateUserInput
@@ -49,7 +49,7 @@ export class UserController {
   }
 
   @Admin()
-  @Delete(':uid')
+  @Delete(':authUid')
   delete(@Param() findOneUserInput: FindOneUserInput): Promise<User> {
     return this.userService.delete(findOneUserInput);
   }

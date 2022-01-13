@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   public getTokens(user: User): Tokens {
-    const payload: JwtPayload = { authUid: user.uid, name: user.name };
+    const payload: JwtPayload = { authUid: user.authUid, name: user.name };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.appConfiguration.app.accessTokenSecret,
@@ -68,7 +68,8 @@ export class AuthService {
   ): Promise<Object> {
     const { authUid, email } = changeAuthPasswordInput;
 
-    if (authUid !== user.uid) throw new ConflictException('invalid authUid.');
+    if (authUid !== user.authUid)
+      throw new ConflictException('invalid authUid.');
 
     if (email !== user.email) throw new ConflictException('invalid email.');
 

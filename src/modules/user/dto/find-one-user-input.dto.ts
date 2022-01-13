@@ -12,7 +12,7 @@ export class FindOneUserInput {
   @IsNotEmpty()
   @IsString()
   @IsUUID()
-  readonly uid: string;
+  readonly authUid: string;
 
   @ApiProperty()
   @IsOptional()

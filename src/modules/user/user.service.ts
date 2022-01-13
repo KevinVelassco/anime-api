@@ -43,14 +43,16 @@ export class UserService {
   public async findOne(
     findOneUserInput: FindOneUserInput
   ): Promise<User | null> {
-    const { uid, checkIfExists = false } = findOneUserInput;
+    const { authUid, checkIfExists = false } = findOneUserInput;
 
     const item = await this.userRepository.findOne({
-      where: { uid }
+      where: { authUid }
     });
 
     if (checkIfExists && !item) {
-      throw new NotFoundException(`can't get the user with uuid ${uid}.`);
+      throw new NotFoundException(
+        `can't get the user with authUid ${authUid}.`
+      );
     }
 
     return item || null;
@@ -81,10 +83,10 @@ export class UserService {
     findOneUserInput: FindOneUserInput,
     updateUserInput: UpdateUserInput
   ): Promise<User> {
-    const { uid } = findOneUserInput;
+    const { authUid } = findOneUserInput;
 
     const existing = await this.findOne({
-      uid,
+      authUid,
       checkIfExists: true
     });
 
@@ -98,10 +100,10 @@ export class UserService {
   }
 
   public async delete(findOneUserInput: FindOneUserInput): Promise<User> {
-    const { uid } = findOneUserInput;
+    const { authUid } = findOneUserInput;
 
     const existing = await this.findOne({
-      uid,
+      authUid,
       checkIfExists: true
     });
 
@@ -135,7 +137,7 @@ export class UserService {
 
     const user = await this.userRepository.findOne({
       where: {
-        uid: authUid,
+        authUid,
         email
       }
     });

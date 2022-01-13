@@ -5,6 +5,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Request } from 'express';
 
 import appConfig from '../../../config/app.config';
+import { UserService } from '../../../modules/user/user.service';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -12,7 +13,8 @@ export class JwtRefreshStrategy extends PassportStrategy(
   'jwt-refresh'
 ) {
   constructor(
-    @Inject(appConfig.KEY) configService: ConfigType<typeof appConfig>
+    @Inject(appConfig.KEY) configService: ConfigType<typeof appConfig>,
+    private readonly userService: UserService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -29,6 +31,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
       throw new UnauthorizedException('authorization header not found');
     }
 
-    return { authUid: payload.authUid, name: payload.name, refreshToken };
+    const { authUid } = payload;
+
+    const { password, ...user } = await this.userService.findOne({
+      authUid,
+      checkIfExists: true
+    });
+
+    return { ...user, refreshToken };
   }
 }

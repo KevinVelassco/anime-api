@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const { authUid } = payload;
 
     const { password, ...user } = await this.userService.findOne({
-      uid: authUid,
+      authUid,
       checkIfExists: true
     });
 
