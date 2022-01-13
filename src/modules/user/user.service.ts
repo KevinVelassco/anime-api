@@ -12,6 +12,7 @@ import { FindAllUsersInput } from './dto/find-all-users-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
+import { GetUserByAuthUidAndEmailInput } from './dto/get-user-by-auth-uid-and-email-input.dto';
 
 @Injectable()
 export class UserService {
@@ -87,18 +88,6 @@ export class UserService {
       checkIfExists: true
     });
 
-    const { email } = updateUserInput;
-
-    if (email) {
-      const user = await this.getUserByEmail({ email });
-
-      if (user) {
-        throw new ConflictException(
-          `already exists a user with email ${email}`
-        );
-      }
-    }
-
     const preloaded = await this.userRepository.preload({
       id: existing.id,
       ...updateUserInput
@@ -131,6 +120,31 @@ export class UserService {
         email
       }
     });
+
+    return user || null;
+  }
+
+  public async getUserByAuthUidAndEmail(
+    getUserByAuthUidAndEmailInput: GetUserByAuthUidAndEmailInput
+  ): Promise<User | null> {
+    const {
+      authUid,
+      email,
+      checkIfExists = false
+    } = getUserByAuthUidAndEmailInput;
+
+    const user = await this.userRepository.findOne({
+      where: {
+        uid: authUid,
+        email
+      }
+    });
+
+    if (checkIfExists && !user) {
+      throw new NotFoundException(
+        `can't get the user with email ${email} for the authUid ${authUid}.`
+      );
+    }
 
     return user || null;
   }
