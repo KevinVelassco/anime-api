@@ -11,6 +11,7 @@ import { GetCurrentUser } from '../../common/decorators/get-current-user.decorat
 import { ChangeAuthPasswordInput } from './dto/change-auth-password-input.dto';
 import { MessageOutput } from '../../common/dto/message-output.dto';
 import { SendResetAuthPasswordEmailInput } from './dto/send-reset-auth-password-email-input.dto';
+import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -47,5 +48,13 @@ export class AuthController {
     return this.authService.sendResetPasswordEmail(
       sendResetAuthPasswordEmailInput
     );
+  }
+
+  @Public()
+  @Put('reset-password')
+  resetPassword(
+    @Body() resetAuthPasswordInput: ResetAuthPasswordInput
+  ): Promise<MessageOutput> {
+    return this.authService.resetPassword(resetAuthPasswordInput);
   }
 }
