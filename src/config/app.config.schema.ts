@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 export default Joi.object({
   /* PORT APP */
   PORT: Joi.number().required(),
+  SELF_WEB_URL: Joi.required(),
   ACCESS_TOKEN_SECRET: Joi.required(),
   ACCESS_TOKEN_EXPIRATION: Joi.required(),
   REFRESH_TOKEN_SECRET: Joi.required(),
@@ -19,5 +20,10 @@ export default Joi.object({
   /* CLOUDINARY */
   CLOUDINARY_CLOUD_NAME: Joi.required(),
   CLOUDINARY_API_KEY: Joi.required(),
-  CLOUDINARY_API_SECRET: Joi.required()
+  CLOUDINARY_API_SECRET: Joi.required(),
+
+  /* MAILGUN */
+  MAILGUN_DOMAIN: Joi.required(),
+  MAILGUN_PRIVATE_KEY: Joi.required(),
+  MAILGUN_EMAIL_FROM: Joi.required()
 });

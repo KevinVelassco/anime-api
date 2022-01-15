@@ -4,6 +4,7 @@ export default registerAs('config', () => ({
   environment: process.env.NODE_ENV || 'local',
   app: {
     port: parseInt(process.env.PORT, 10) || 8080,
+    selftWebUrl: process.env.SELF_WEB_URL,
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
     accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
@@ -22,5 +23,10 @@ export default registerAs('config', () => ({
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,
     apiSecret: process.env.CLOUDINARY_API_SECRET
+  },
+  mailgun: {
+    domain: process.env.MAILGUN_DOMAIN,
+    privateKey: process.env.MAILGUN_PRIVATE_KEY,
+    emailFrom: process.env.MAILGUN_EMAIL_FROM
   }
 }));
