@@ -6,14 +6,16 @@ import {
   DeleteDateColumn,
   Entity,
   Generated,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn
 } from 'typeorm';
-
 import * as bcrypt from 'bcrypt';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+
+import { VerificationCode } from '../verification-code/verification-code.entity';
 
 @Entity('users')
 @Unique('uq_user_auth_uid', ['authUid'])
@@ -70,4 +72,10 @@ export class User {
   async checkPassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }
+
+  @OneToMany(
+    () => VerificationCode,
+    (verificationCode: VerificationCode) => verificationCode.user
+  )
+  verificationCodes: VerificationCode[];
 }
