@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -24,6 +25,7 @@ import { MessageOutput } from '../../common/dto/message-output.dto';
 import { VerificationCodeService } from '../verification-code/verification-code.service';
 import { VerificationCodeType } from '../verification-code/verification-code.entity';
 import { addTimeToDate, TimeType } from '../../utils';
+import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
 
 @Injectable()
 export class AuthService {
@@ -195,5 +197,39 @@ export class AuthService {
     });
 
     return { message: 'password reset instructions email sent.' };
+  }
+
+  public async resetPassword(
+    resetAuthPasswordInput: ResetAuthPasswordInput
+  ): Promise<MessageOutput> {
+    const { code } = resetAuthPasswordInput;
+
+    const verificationCode = await this.verificationCodeService.validate({
+      code,
+      type: VerificationCodeType.RESET_PASSWORD
+    });
+
+    const { password, confirmedPassword } = resetAuthPasswordInput;
+
+    if (password !== confirmedPassword) {
+      throw new BadRequestException('the passwords do not match.');
+    }
+
+    const { user } = verificationCode;
+
+    const preloaded = await this.userRepository.preload({
+      id: user.id,
+      password
+    });
+
+    await this.userRepository.save(preloaded);
+
+    await this.verificationCodeService.delete({ uid: verificationCode.uid });
+
+    const { email, authUid } = user;
+
+    this.sendPasswordUpdateEmail({ email, authUid }).catch(console.error);
+
+    return { message: 'password changed successfully.' };
   }
 }
