@@ -12,6 +12,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './stratigies/jwt.strategy';
 import { JwtRefreshStrategy } from './stratigies/jwt-refresh.strategy';
 import { EmailTemplateModule } from '../email-template/email-template.module';
+import { VerificationCodeModule } from '../verification-code/verification-code.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { EmailTemplateModule } from '../email-template/email-template.module';
     PassportModule,
     UserModule,
     MailgunModule,
-    EmailTemplateModule
+    EmailTemplateModule,
+    VerificationCodeModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy]

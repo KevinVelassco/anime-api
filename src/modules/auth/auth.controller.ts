@@ -9,6 +9,8 @@ import { AuthService } from './auth.service';
 import { Tokens } from './types/tokens.type';
 import { GetCurrentUser } from '../../common/decorators/get-current-user.decorator';
 import { ChangeAuthPasswordInput } from './dto/change-auth-password-input.dto';
+import { MessageOutput } from '../../common/dto/message-output.dto';
+import { SendResetAuthPasswordEmailInput } from './dto/send-reset-auth-password-email-input.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -33,7 +35,17 @@ export class AuthController {
   changePassword(
     @GetCurrentUser() user: User,
     @Body() changeAuthPasswordInput: ChangeAuthPasswordInput
-  ): Promise<Object> {
+  ): Promise<MessageOutput> {
     return this.authService.changePassword(user, changeAuthPasswordInput);
+  }
+
+  @Public()
+  @Post('send-reset-password-email')
+  sendResetPasswordEmail(
+    @Body() sendResetAuthPasswordEmailInput: SendResetAuthPasswordEmailInput
+  ): Promise<MessageOutput> {
+    return this.authService.sendResetPasswordEmail(
+      sendResetAuthPasswordEmailInput
+    );
   }
 }
