@@ -10,6 +10,10 @@ import { UserService } from '../user/user.service';
 import { JwtPayload } from './types/jwt-payload.type';
 import { Tokens } from './types/tokens.type';
 import { ChangeAuthPasswordInput } from './dto/change-auth-password-input.dto';
+import { SendAuthPasswordUpdateEmailInput } from './dto/send-auth-password-update-email-input.dto';
+import { MailgunService } from '../../common/plugins/mailgun/mailgun.service';
+import { EmailTemplateService } from '../email-template/email-template.service';
+import { TemplateType } from '../email-template/email-template.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +23,9 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly userService: UserService,
-    private jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly emailTemplateService: EmailTemplateService,
+    private readonly mailgunService: MailgunService
   ) {}
 
   public async validateUser(email: string, password: string): Promise<any> {
@@ -68,10 +74,13 @@ export class AuthService {
   ): Promise<Object> {
     const { authUid, email } = changeAuthPasswordInput;
 
-    if (authUid !== user.authUid)
+    if (authUid !== user.authUid) {
       throw new ConflictException('invalid authUid.');
+    }
 
-    if (email !== user.email) throw new ConflictException('invalid email.');
+    if (email !== user.email) {
+      throw new ConflictException('invalid email.');
+    }
 
     const existing = await this.userService.getUserByAuthUidAndEmail({
       authUid,
@@ -104,6 +113,37 @@ export class AuthService {
 
     await this.userRepository.save(preloaded);
 
+    this.sendPasswordUpdateEmail({ email, authUid }).catch(console.error);
+
     return { message: 'password changed successfully.' };
+  }
+
+  private async sendPasswordUpdateEmail(
+    sendAuthPasswordUpdateEmailInput: SendAuthPasswordUpdateEmailInput
+  ): Promise<void> {
+    const { authUid, email } = sendAuthPasswordUpdateEmailInput;
+
+    const existing = await this.userService.getUserByAuthUidAndEmail({
+      authUid,
+      email,
+      checkIfExists: true
+    });
+
+    const { subject, html } =
+      await this.emailTemplateService.generateTemplateHtml({
+        type: TemplateType.PASSWORD_UPDATED_EMAIL,
+        parameters: {
+          email,
+          name: existing.name,
+          link: `${this.appConfiguration.app.selftWebUrl}recover-password`
+        }
+      });
+
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      to: email,
+      subject,
+      html
+    });
   }
 }
