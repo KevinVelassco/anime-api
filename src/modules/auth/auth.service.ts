@@ -1,4 +1,9 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +19,11 @@ import { SendAuthPasswordUpdateEmailInput } from './dto/send-auth-password-updat
 import { MailgunService } from '../../common/plugins/mailgun/mailgun.service';
 import { EmailTemplateService } from '../email-template/email-template.service';
 import { TemplateType } from '../email-template/email-template.entity';
+import { SendResetAuthPasswordEmailInput } from './dto/send-reset-auth-password-email-input.dto';
+import { MessageOutput } from '../../common/dto/message-output.dto';
+import { VerificationCodeService } from '../verification-code/verification-code.service';
+import { VerificationCodeType } from '../verification-code/verification-code.entity';
+import { addTimeToDate, TimeType } from '../../utils';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +35,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly emailTemplateService: EmailTemplateService,
-    private readonly mailgunService: MailgunService
+    private readonly mailgunService: MailgunService,
+    private readonly verificationCodeService: VerificationCodeService
   ) {}
 
   public async validateUser(email: string, password: string): Promise<any> {
@@ -71,7 +82,7 @@ export class AuthService {
   public async changePassword(
     user: User,
     changeAuthPasswordInput: ChangeAuthPasswordInput
-  ): Promise<Object> {
+  ): Promise<MessageOutput> {
     const { authUid, email } = changeAuthPasswordInput;
 
     if (authUid !== user.authUid) {
@@ -145,5 +156,44 @@ export class AuthService {
       subject,
       html
     });
+  }
+
+  public async sendResetPasswordEmail(
+    sendResetAuthPasswordEmailInput: SendResetAuthPasswordEmailInput
+  ): Promise<MessageOutput> {
+    const { email } = sendResetAuthPasswordEmailInput;
+
+    const existing = await this.userService.getUserByEmail({ email });
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the user with email ${email}`);
+    }
+
+    const currentDate = new Date();
+
+    const verificationCode = await this.verificationCodeService.create({
+      type: VerificationCodeType.RESET_PASSWORD,
+      expirationDate: addTimeToDate(currentDate, 1, TimeType.Days),
+      user: existing
+    });
+
+    const { subject, html } =
+      await this.emailTemplateService.generateTemplateHtml({
+        type: TemplateType.RESET_PASSWORD_EMAIL,
+        parameters: {
+          email,
+          name: existing.name,
+          link: `${this.appConfiguration.app.selftWebUrl}change-password?code=${verificationCode.code}`
+        }
+      });
+
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      to: email,
+      subject,
+      html
+    });
+
+    return { message: 'password reset instructions email sent.' };
   }
 }
