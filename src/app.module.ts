@@ -17,6 +17,8 @@ import { ImageModule } from './modules/image/image.module';
 import { AssignedImageModule } from './modules/assigned-image/assigned-image.module';
 import { RaceModule } from './modules/race/race.module';
 import { OriginModule } from './modules/origin/origin.module';
+import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
+import { EmailTemplateModule } from './modules/email-template/email-template.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -56,7 +58,9 @@ const envFilePath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     ImageModule,
     AssignedImageModule,
     RaceModule,
-    OriginModule
+    OriginModule,
+    VerificationCodeModule,
+    EmailTemplateModule
   ],
   controllers: [AppController],
   providers: [AppService]
