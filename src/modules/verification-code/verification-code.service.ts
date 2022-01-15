@@ -10,6 +10,7 @@ import { generateUuid } from '../../utils';
 import { VerificationCode } from './verification-code.entity';
 import { CreateVerificationCodeInput } from './dto/create-verification-code-input.dto';
 import { ValidateVerificationCodeInput } from './dto/validate-verification-code-input.dto';
+import { FindOneVerificationCodeInput } from './dto/find-one-verification-code-input.dto';
 
 @Injectable()
 export class VerificationCodeService {
@@ -66,5 +67,24 @@ export class VerificationCodeService {
     }
 
     return existing;
+  }
+
+  public async delete(
+    findOneVerificationCodeInput: FindOneVerificationCodeInput
+  ) {
+    const { uid } = findOneVerificationCodeInput;
+
+    const existing = await this.verificationCodeRepository.findOne({
+      where: { uid }
+    });
+
+    if (!existing)
+      throw new NotFoundException(
+        `can't get the verification code with uid ${uid}`
+      );
+
+    const deleted = await this.verificationCodeRepository.softRemove(existing);
+
+    return deleted;
   }
 }
