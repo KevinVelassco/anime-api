@@ -1,9 +1,11 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigType } from '@nestjs/config';
 import { ILike, Repository } from 'typeorm';
 
 import { User } from './user.entity';
@@ -13,12 +15,26 @@ import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { GetUserByEmailInput } from './dto/get-user-by-email-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { GetUserByAuthUidAndEmailInput } from './dto/get-user-by-auth-uid-and-email-input.dto';
+import { SendUserConfirmationEmailInput } from './dto/send-user-confirmation-email-input.dto';
+import { MessageOutput } from '../../common/dto/message-output.dto';
+import { VerificationCodeService } from '../verification-code/verification-code.service';
+import { VerificationCodeType } from '../verification-code/verification-code.entity';
+import { addTimeToDate, TimeType } from '../../utils';
+import { EmailTemplateService } from '../email-template/email-template.service';
+import { MailgunService } from '../../common/plugins/mailgun/mailgun.service';
+import { TemplateType } from '../email-template/email-template.entity';
+import appConfig from '../../config/app.config';
 
 @Injectable()
 export class UserService {
   constructor(
+    @Inject(appConfig.KEY)
+    private readonly appConfiguration: ConfigType<typeof appConfig>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    private readonly verificationCodeService: VerificationCodeService,
+    private readonly emailTemplateService: EmailTemplateService,
+    private readonly mailgunService: MailgunService
   ) {}
 
   public async findAll(findAllUsersInput: FindAllUsersInput): Promise<any> {
@@ -71,10 +87,15 @@ export class UserService {
 
     const created = this.userRepository.create({
       ...createUserInput,
-      isAdmin
+      isAdmin,
+      verifiedEmail: false
     });
 
     const saved = await this.userRepository.save(created);
+
+    this.sendConfirmationEmail({
+      authUid: saved.authUid
+    }).catch(console.error);
 
     return saved;
   }
@@ -149,5 +170,47 @@ export class UserService {
     }
 
     return user || null;
+  }
+
+  public async sendConfirmationEmail(
+    sendUserConfirmationEmailInput: SendUserConfirmationEmailInput
+  ): Promise<MessageOutput> {
+    const { authUid } = sendUserConfirmationEmailInput;
+
+    const user = await this.findOne({
+      authUid,
+      checkIfExists: true
+    });
+
+    const currentDate = new Date();
+
+    const verificationCode = await this.verificationCodeService.create({
+      type: VerificationCodeType.CONFIRM_EMAIL,
+      expirationDate: addTimeToDate(currentDate, 1, TimeType.Days),
+      user
+    });
+
+    const { name, email } = user;
+
+    const { subject, html } =
+      await this.emailTemplateService.generateTemplateHtml({
+        type: TemplateType.WELCOME_EMAIL,
+        parameters: {
+          email,
+          name,
+          link: `${this.appConfiguration.app.selftWebUrl}confirm-email?code=${verificationCode.code}`
+        }
+      });
+
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      to: email,
+      subject,
+      html
+    });
+
+    return {
+      message: 'welcome email sent.'
+    };
   }
 }
