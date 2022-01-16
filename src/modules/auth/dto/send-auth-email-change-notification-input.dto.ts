@@ -1,10 +1,10 @@
 import { IsEmail, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class SendAuthPasswordUpdateEmailInput {
+export class SendAuthEmailChangeNotificationInput {
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  readonly email: string;
+  readonly oldEmail: string;
 
   @IsNotEmpty()
   @IsString()
