@@ -49,6 +49,10 @@ export class User {
   isAdmin: boolean;
 
   @ApiProperty()
+  @Column({ name: 'verified_email', type: 'boolean', default: false })
+  verifiedEmail: boolean;
+
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
