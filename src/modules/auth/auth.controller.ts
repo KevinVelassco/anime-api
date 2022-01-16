@@ -12,6 +12,7 @@ import { ChangeAuthPasswordInput } from './dto/change-auth-password-input.dto';
 import { MessageOutput } from '../../common/dto/message-output.dto';
 import { SendResetAuthPasswordEmailInput } from './dto/send-reset-auth-password-email-input.dto';
 import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
+import { ChangeAuthEmailInput } from './dto/change-auth-email-Input.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -56,5 +57,13 @@ export class AuthController {
     @Body() resetAuthPasswordInput: ResetAuthPasswordInput
   ): Promise<MessageOutput> {
     return this.authService.resetPassword(resetAuthPasswordInput);
+  }
+
+  @Put('change-email')
+  changeEmail(
+    @GetCurrentUser() user: User,
+    @Body() changeAuthEmailInput: ChangeAuthEmailInput
+  ): Promise<MessageOutput> {
+    return this.authService.changeEmail(user, changeAuthEmailInput);
   }
 }
