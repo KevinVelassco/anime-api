@@ -26,6 +26,9 @@ import { VerificationCodeService } from '../verification-code/verification-code.
 import { VerificationCodeType } from '../verification-code/verification-code.entity';
 import { addTimeToDate, TimeType } from '../../utils';
 import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
+import { SendAuthEmailChangeNotificationInput } from './dto/send-auth-email-change-notification-input.dto';
+import { SendAuthConfirmationEmailInput } from './dto/send-auth-confirmation-email-input.dto';
+import { ChangeAuthEmailInput } from './dto/change-auth-email-Input.dto';
 
 @Injectable()
 export class AuthService {
@@ -231,5 +234,130 @@ export class AuthService {
     this.sendPasswordUpdateEmail({ email, authUid }).catch(console.error);
 
     return { message: 'password changed successfully.' };
+  }
+
+  public async sendEmailChangeNotification(
+    sendAuthEmailChangeNotificationInput: SendAuthEmailChangeNotificationInput
+  ): Promise<MessageOutput> {
+    const { authUid, oldEmail } = sendAuthEmailChangeNotificationInput;
+
+    const existing = await this.userService.findOne({
+      authUid,
+      checkIfExists: true
+    });
+
+    const { subject, html } =
+      await this.emailTemplateService.generateTemplateHtml({
+        type: TemplateType.EMAIL_CHANGE_NOTIFICATION_EMAIL,
+        parameters: {
+          name: existing.name
+        }
+      });
+
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      to: oldEmail,
+      subject,
+      html
+    });
+
+    return {
+      message: 'email for email change notification sent.'
+    };
+  }
+
+  public async sendConfirmationEmail(
+    sendAuthConfirmationEmailInput: SendAuthConfirmationEmailInput
+  ): Promise<MessageOutput> {
+    const { authUid } = sendAuthConfirmationEmailInput;
+
+    const user = await this.userService.findOne({
+      authUid,
+      checkIfExists: true
+    });
+
+    const currentDate = new Date();
+
+    const verificationCode = await this.verificationCodeService.create({
+      type: VerificationCodeType.CONFIRM_EMAIL,
+      expirationDate: addTimeToDate(currentDate, 1, TimeType.Days),
+      user
+    });
+
+    const { name, email } = user;
+
+    const { subject, html } =
+      await this.emailTemplateService.generateTemplateHtml({
+        type: TemplateType.CONFIRMATION_EMAIL,
+        parameters: {
+          email,
+          name,
+          link: `${this.appConfiguration.app.selftWebUrl}confirm-email?code=${verificationCode.code}`
+        }
+      });
+
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      to: email,
+      subject,
+      html
+    });
+
+    return {
+      message: 'email to confirm email sent.'
+    };
+  }
+
+  public async changeEmail(
+    user: User,
+    changeAuthEmailInput: ChangeAuthEmailInput
+  ): Promise<MessageOutput> {
+    const { authUid } = changeAuthEmailInput;
+
+    if (authUid !== user.authUid) {
+      throw new ConflictException('invalid authUid.');
+    }
+
+    const existingUser = await this.userService.findOne({
+      authUid,
+      checkIfExists: true
+    });
+
+    const { email } = changeAuthEmailInput;
+
+    if (existingUser.email === email) {
+      throw new NotFoundException(
+        'the new email must be different from the old one.'
+      );
+    }
+
+    const existingUserWithSameEmail = await this.userService.getUserByEmail({
+      email
+    });
+
+    if (existingUserWithSameEmail) {
+      throw new ConflictException(`the email ${email} it's already used.`);
+    }
+
+    const oldEmail = existingUser.email;
+
+    const preloaded = await this.userRepository.preload({
+      id: existingUser.id,
+      email,
+      verifiedEmail: false
+    });
+
+    await this.userRepository.save(preloaded);
+
+    this.sendEmailChangeNotification({
+      oldEmail,
+      authUid
+    }).catch(console.error);
+
+    this.sendConfirmationEmail({
+      authUid
+    }).catch(console.error);
+
+    return { message: 'email change successful.' };
   }
 }
