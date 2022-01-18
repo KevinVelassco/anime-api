@@ -13,6 +13,7 @@ import { JwtStrategy } from './stratigies/jwt.strategy';
 import { JwtRefreshStrategy } from './stratigies/jwt-refresh.strategy';
 import { EmailTemplateModule } from '../email-template/email-template.module';
 import { VerificationCodeModule } from '../verification-code/verification-code.module';
+import { JwtVerifyStrategy } from './stratigies/jwt-verify.strategy';
 
 @Module({
   imports: [
@@ -25,6 +26,12 @@ import { VerificationCodeModule } from '../verification-code/verification-code.m
     VerificationCodeModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy]
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    JwtVerifyStrategy
+  ]
 })
 export class AuthModule {}

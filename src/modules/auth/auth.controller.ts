@@ -13,6 +13,8 @@ import { MessageOutput } from '../../common/dto/message-output.dto';
 import { SendResetAuthPasswordEmailInput } from './dto/send-reset-auth-password-email-input.dto';
 import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
 import { ChangeAuthEmailInput } from './dto/change-auth-email-Input.dto';
+import { ConfirmUserAuthEmailInput } from './dto/confirm-user-auth-email-input.dto';
+import { JwtVerifyAuthGuard } from '../../common/guards/jwt-verify.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -65,5 +67,15 @@ export class AuthController {
     @Body() changeAuthEmailInput: ChangeAuthEmailInput
   ): Promise<MessageOutput> {
     return this.authService.changeEmail(user, changeAuthEmailInput);
+  }
+
+  @Public()
+  @UseGuards(JwtVerifyAuthGuard)
+  @Put('confirm-email')
+  confirmEmail(
+    @GetCurrentUser() user: User,
+    @Body() confirmUserAuthEmailInput: ConfirmUserAuthEmailInput
+  ): Promise<MessageOutput> {
+    return this.authService.confirmEmail(user, confirmUserAuthEmailInput);
   }
 }
