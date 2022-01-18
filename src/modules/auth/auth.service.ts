@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   NotFoundException
@@ -29,6 +31,7 @@ import { ResetAuthPasswordInput } from './dto/reset-auth-password-input.dto';
 import { SendAuthEmailChangeNotificationInput } from './dto/send-auth-email-change-notification-input.dto';
 import { SendAuthConfirmationEmailInput } from './dto/send-auth-confirmation-email-input.dto';
 import { ChangeAuthEmailInput } from './dto/change-auth-email-Input.dto';
+import { ConfirmUserAuthEmailInput } from './dto/confirm-user-auth-email-input.dto';
 
 @Injectable()
 export class AuthService {
@@ -58,7 +61,23 @@ export class AuthService {
   }
 
   public async login(user: User): Promise<Tokens> {
-    return this.getTokens(user);
+    const tokens = this.getTokens(user);
+
+    const { verifiedEmail } = user;
+
+    if (!verifiedEmail) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.FORBIDDEN,
+          message:
+            'successfully logged in, please verify your account to access resources',
+          ...tokens
+        },
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    return tokens;
   }
 
   public async refreshTokens(user: User): Promise<Tokens> {
@@ -359,5 +378,34 @@ export class AuthService {
     }).catch(console.error);
 
     return { message: 'email change successful.' };
+  }
+
+  public async confirmEmail(
+    currentUser: User,
+    confirmUserAuthEmailInput: ConfirmUserAuthEmailInput
+  ): Promise<MessageOutput> {
+    const { code } = confirmUserAuthEmailInput;
+
+    const verificationCode = await this.verificationCodeService.validate({
+      code,
+      type: VerificationCodeType.CONFIRM_EMAIL
+    });
+
+    const { user } = verificationCode;
+
+    if (user.authUid !== currentUser.authUid) {
+      throw new ConflictException('invalid authUid.');
+    }
+
+    const preloaded = await this.userRepository.preload({
+      id: user.id,
+      verifiedEmail: true
+    });
+
+    await this.userRepository.save(preloaded);
+
+    await this.verificationCodeService.delete({ uid: verificationCode.uid });
+
+    return { message: 'email verified successfully.' };
   }
 }
