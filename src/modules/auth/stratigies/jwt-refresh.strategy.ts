@@ -1,4 +1,9 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  UnauthorizedException,
+  ForbiddenException
+} from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -33,10 +38,19 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     const { authUid } = payload;
 
-    const { password, ...user } = await this.userService.findOne({
-      authUid,
-      checkIfExists: true
-    });
+    const existingUser = await this.userService.findOne({ authUid });
+
+    if (!existingUser) {
+      throw new UnauthorizedException();
+    }
+
+    if (!existingUser.verifiedEmail) {
+      throw new ForbiddenException(
+        'your account must be verified to access resources.'
+      );
+    }
+
+    const { password, ...user } = existingUser;
 
     return { ...user, refreshToken };
   }
