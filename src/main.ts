@@ -1,4 +1,8 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -36,7 +40,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const PORT = configService.get<number>('config.app.port');
+  const ENVIRONMENT = configService.get<string>('config.environment');
 
   await app.listen(PORT);
+
+  Logger.debug(`server listening at ${PORT} | ${ENVIRONMENT} `, 'main.ts');
 }
 bootstrap();
